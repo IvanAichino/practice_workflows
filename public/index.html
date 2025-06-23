@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TypeScript REST API - Feriados Argentinos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary-color: #64748b;
+            --accent-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --success-color: #22c55e;
+            --background: #ffffff;
+            --surface: #f8fafc;
+            --surface-elevated: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --border-light: #f1f5f9;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --radius: 8px;
+            --radius-lg: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: var(--background);
+            font-size: 16px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Header */
+        .header {
+            background: var(--surface-elevated);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(8px);
+            background: rgba(248, 250, 252, 0.95);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 20px;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: var(--radius);
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color);
+            background: var(--surface);
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            background: var(--success-color);
+            color: white;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            background: currentColor;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Main Content */
+        .main {
+            padding: 48px 0;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 64px;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 20px;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 32px;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: var(--radius);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-secondary {
+            background: var(--surface);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--surface-elevated);
+            border-color: var(--primary-color);
+        }
+
+        /* Content Sections */
+        .content {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 48px;
+            align-items: start;
+        }
+
+        .sidebar {
+            position: sticky;
+            top: 120px;
+        }
+
+        .toc {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            border: 1px solid var(--border);
+        }
+
+        .toc h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+
+        .toc ul {
+            list-style: none;
+        }
+
+        .toc li {
+            margin-bottom: 8px;
+        }
+
+        .toc a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            padding: 4px 0;
+            display: block;
+            transition: color 0.2s ease;
+        }
+
+        .toc a:hover {
+            color: var(--primary-color);
+        }
+
+        .article {
+            background: var(--surface-elevated);
+            border-radius: var(--radius-lg);
+            padding: 48px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .article h1 {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+
+        .article h2 {
+            font-size: 28px;
+            font-weight: 600;
+            margin: 48px 0 24px 0;
+            color: var(--text-primary);
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--border-light);
+        }
+
+        .article h3 {
+            font-size: 22px;
+            font-weight: 600;
+            margin: 32px 0 16px 0;
+            color: var(--text-primary);
+        }
+
+        .article h4 {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 24px 0 12px 0;
+            color: var(--text-primary);
+        }
+
+        .article p {
+            margin-bottom: 16px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        .article ul, .article ol {
+            margin: 16px 0 16px 24px;
+            color: var(--text-secondary);
+        }
+
+        .article li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .article code {
+            background: var(--surface);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+            font-size: 14px;
+            color: var(--primary-color);
+            border: 1px solid var(--border);
+        }
+
+        .article pre {
+            background: #2d3748;
+            border-radius: var(--radius);
+            padding: 24px;
+            margin: 24px 0;
+            overflow-x: auto;
+            border: 1px solid var(--border);
+        }
+
+        .article pre code {
+            background: none;
+            padding: 0;
+            border: none;
+            color: #e2e8f0;
+            font-size: 14px;
+        }
+
+        .article table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 24px 0;
+            background: var(--surface-elevated);
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .article th, .article td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .article th {
+            background: var(--surface);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .article td {
+            color: var(--text-secondary);
+        }
+
+        .article blockquote {
+            border-left: 4px solid var(--primary-color);
+            padding: 16px 24px;
+            margin: 24px 0;
+            background: var(--surface);
+            border-radius: 0 var(--radius) var(--radius) 0;
+        }
+
+        /* Feature Cards */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin: 48px 0;
+        }
+
+        .feature-card {
+            background: var(--surface-elevated);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            border: 1px solid var(--border);
+            transition: all 0.2s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+            color: white;
+            font-size: 20px;
+        }
+
+        .feature-card h3 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* API Demo */
+        .api-demo {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            margin: 48px 0;
+            border: 1px solid var(--border);
+        }
+
+        .api-demo h3 {
+            margin-bottom: 24px;
+            color: var(--text-primary);
+        }
+
+        .endpoint {
+            background: var(--surface-elevated);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border);
+        }
+
+        .endpoint-method {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 12px;
+        }
+
+        .method-get {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .method-post {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .endpoint-url {
+            font-family: 'SF Mono', Monaco, monospace;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .endpoint-desc {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-top: 8px;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            padding: 48px 0;
+            margin-top: 96px;
+        }
+
+        .footer-content {
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            margin-bottom: 24px;
+        }
+
+        .footer-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .footer-link:hover {
+            color: var(--primary-color);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .content {
+                grid-template-columns: 1fr;
+                gap: 32px;
+            }
+
+            .sidebar {
+                position: static;
+                order: -1;
+            }
+
+            .toc {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 16px;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 16px;
+                text-align: center;
+            }
+
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .hero h1 {
+                font-size: 36px;
+            }
+
+            .hero p {
+                font-size: 18px;
+            }
+
+            .hero-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .article {
+                padding: 32px 24px;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 28px;
+            }
+
+            .article {
+                padding: 24px 16px;
+            }
+
+            .article h1 {
+                font-size: 28px;
+            }
+
+            .article h2 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="#" class="logo">
+                    <div class="logo-icon">TS</div>
+                    TypeScript REST API
+                </a>
+                <nav class="nav-links">
+                    <a href="#features" class="nav-link">Características</a>
+                    <a href="#installation" class="nav-link">Instalación</a>
+                    <a href="#api" class="nav-link">API</a>
+                    <a href="#testing" class="nav-link">Testing</a>
+                    <div class="status-badge">
+                        <div class="status-dot"></div>
+                        En línea
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <section class="hero">
+                <h1>TypeScript REST API</h1>
+                <p>Una API REST completa desarrollada en TypeScript que integra con la API pública de Argentina Datos para obtener información sobre feriados argentinos del año 2025.</p>
+                <div class="hero-actions">
+                    <a href="/api/feriados" class="btn btn-primary">
+                        🚀 Probar API
+                    </a>
+                    <a href="/health" class="btn btn-secondary">
+                        ❤️ Health Check
+                    </a>
+                </div>
+            </section>
+
+            <div class="features">
+                <div class="feature-card">
+                    <div class="feature-icon">🔧</div>
+                    <h3>Servidor HTTP</h3>
+                    <p>Express.js con TypeScript y tipado estricto para máxima seguridad y mantenibilidad.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🌐</div>
+                    <h3>API REST</h3>
+                    <p>Endpoints bien estructurados con validación de entrada y respuestas consistentes.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔗</div>
+                    <h3>Integración Externa</h3>
+                    <p>Consulta automática a la API de Argentina Datos con manejo robusto de errores.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📝</div>
+                    <h3>Logging Estructurado</h3>
+                    <p>Sistema de logging con Winston (JSON/pretty format) para monitoreo completo.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🧪</div>
+                    <h3>Testing Completo</h3>
+                    <p>Unit tests e integration tests con Jest (+80% coverage) para calidad garantizada.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🛡️</div>
+                    <h3>Seguridad</h3>
+                    <p>Rate limiting, CORS, Helmet y validación robusta para protección completa.</p>
+                </div>
+            </div>
+
+            <div class="content">
+                <aside class="sidebar">
+                    <div class="toc">
+                        <h3>Contenido</h3>
+                        <ul>
+                            <li><a href="#features">🚀 Características</a></li>
+                            <li><a href="#requirements">📋 Requisitos</a></li>
+                            <li><a href="#installation">🛠️ Instalación</a></li>
+                            <li><a href="#api">📚 API Endpoints</a></li>
+                            <li><a href="#testing">🧪 Testing</a></li>
+                            <li><a href="#scripts">📝 Scripts</a></li>
+                            <li><a href="#structure">🏗️ Estructura</a></li>
+                            <li><a href="#config">⚙️ Configuración</a></li>
+                            <li><a href="#security">🔒 Seguridad</a></li>
+                            <li><a href="#monitoring">📊 Monitoreo</a></li>
+                        </ul>
+                    </div>
+                </aside>
+
+                <article class="article">
+                    <h1 id="features">🚀 Características</h1>
+                    <ul>
+                        <li><strong>Servidor HTTP</strong>: Express.js con TypeScript y tipado estricto</li>
+                        <li><strong>API REST</strong>: Endpoints bien estructurados con validación de entrada</li>
+                        <li><strong>Integración Externa</strong>: Consulta automática a la API de Argentina Datos</li>
+                        <li><strong>Logging Estructurado</strong>: Sistema de logging con Winston (JSON/pretty format)</li>
+                        <li><strong>Testing Completo</strong>: Unit tests e integration tests con Jest (+80% coverage)</li>
+                        <li><strong>Validación</strong>: Middleware de validación con Joi</li>
+                        <li><strong>Rate Limiting</strong>: Protección contra spam y abuse</li>
+                        <li><strong>Health Checks</strong>: Endpoints para monitoreo del servicio</li>
+                        <li><strong>CORS & Security</strong>: Configuración segura con Helmet</li>
+                        <li><strong>Arquitectura Modular</strong>: Separación clara de responsabilidades</li>
+                    </ul>
+
+                    <h2 id="requirements">📋 Requisitos</h2>
+                    <ul>
+                        <li>Node.js >= 18.0.0</li>
+                        <li>npm o yarn</li>
+                    </ul>
+
+                    <h2 id="installation">🛠️ Instalación</h2>
+                    <h3>1. Clonar el repositorio</h3>
+                    <pre><code class="language-bash">git clone &lt;repository-url&gt;
+cd typescript-rest-api</code></pre>
+
+                    <h3>2. Instalar dependencias</h3>
+                    <pre><code class="language-bash">npm install</code></pre>
+
+                    <h3>3. Configurar variables de entorno</h3>
+                    <pre><code class="language-bash">cp .env.example .env
+# Editar .env con tus configuraciones</code></pre>
+
+                    <h3>4. Ejecutar en modo desarrollo</h3>
+                    <pre><code class="language-bash">npm run dev</code></pre>
+
+                    <p>El servidor estará disponible en <code>http://localhost:3000</code></p>
+
+                    <h2 id="api">📚 API Endpoints</h2>
+                    
+                    <div class="api-demo">
+                        <h3>Feriados</h3>
+                        
+                        <div class="endpoint">
+                            <span class="endpoint-method method-get">GET</span>
+                            <span class="endpoint-url">/api/feriados</span>
+                            <div class="endpoint-desc">Obtiene la lista de feriados argentinos del 2025.</div>
+                        </div>
+
+                        <div class="endpoint">
+                            <span class="endpoint-method method-get">GET</span>
+                            <span class="endpoint-url">/api/feriados/stats</span>
+                            <div class="endpoint-desc">Obtiene estadísticas de los feriados.</div>
+                        </div>
+
+                        <h4>Query Parameters para /api/feriados:</h4>
+                        <ul>
+                            <li><code>mes</code> (opcional): Filtrar por mes (1-12)</li>
+                            <li><code>tipo</code> (opcional): Filtrar por tipo de feriado</li>
+                        </ul>
+
+                        <h4>Ejemplo:</h4>
+                        <pre><code class="language-bash">curl http://localhost:3000/api/feriados?mes=1</code></pre>
+
+                        <h4>Respuesta:</h4>
+                        <pre><code class="language-json">{
+  "success": true,
+  "data": [
+    {
+      "id": "uuid",
+      "motivo": "Año Nuevo",
+      "tipo": "feriado",
+      "fecha": "2025-01-01",
+      "diaSemana": "Miércoles",
+      "mes": "Enero",
+      "esTraslado": false
+    }
+  ],
+  "message": "Found 1 holidays",
+  "timestamp": "2025-01-08T12:00:00.000Z",
+  "requestId": "req-uuid"
+}</code></pre>
+                    </div>
+
+                    <h3>Health Check</h3>
+                    <div class="api-demo">
+                        <div class="endpoint">
+                            <span class="endpoint-method method-get">GET</span>
+                            <span class="endpoint-url">/health</span>
+                            <div class="endpoint-desc">Verificación básica del estado del servicio.</div>
+                        </div>
+
+                        <div class="endpoint">
+                            <span class="endpoint-method method-get">GET</span>
+                            <span class="endpoint-url">/health/detailed</span>
+                            <div class="endpoint-desc">Verificación detallada incluyendo dependencias externas.</div>
+                        </div>
+                    </div>
+
+                    <h2 id="testing">🧪 Testing</h2>
+                    <pre><code class="language-bash"># Ejecutar tests
+npm test
+
+# Tests en modo watch
+npm run test:watch
+
+# Coverage report
+npm run test:coverage</code></pre>
+
+                    <h2 id="scripts">📝 Scripts Disponibles</h2>
+                    <pre><code class="language-bash"># Desarrollo
+npm run dev          # Servidor con hot reload
+npm run build        # Compilar TypeScript
+npm start           # Ejecutar versión compilada
+
+# Testing
+npm test            # Ejecutar tests
+npm run test:watch  # Tests en modo watch
+npm run test:coverage # Reporte de cobertura
+
+# Code Quality
+npm run lint        # Linter
+npm run lint:fix    # Fix automático de linting
+npm run format      # Formatear código
+npm run format:check # Verificar formato</code></pre>
+
+                    <h2 id="structure">🏗️ Estructura del Proyecto</h2>
+                    <pre><code>src/
+├── config/          # Configuración (logger, environment)
+├── controllers/     # Controladores de rutas
+├── middleware/      # Middleware personalizado
+├── routes/          # Definición de rutas
+├── services/        # Lógica de negocio
+├── types/          # Definiciones TypeScript
+├── utils/          # Utilidades y helpers
+└── __tests__/      # Tests organizados por módulos</code></pre>
+
+                    <h2 id="config">⚙️ Configuración</h2>
+                    <h3>Variables de Entorno</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Variable</th>
+                                <th>Descripción</th>
+                                <th>Default</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>PORT</code></td>
+                                <td>Puerto del servidor</td>
+                                <td><code>3000</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>NODE_ENV</code></td>
+                                <td>Entorno de ejecución</td>
+                                <td><code>development</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>ARGENTINA_DATOS_API_URL</code></td>
+                                <td>URL base de la API externa</td>
+                                <td><code>https://api.argentinadatos.com/v1</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>LOG_LEVEL</code></td>
+                                <td>Nivel de logging</td>
+                                <td><code>info</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>LOG_FORMAT</code></td>
+                                <td>Formato de logs</td>
+                                <td><code>json</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>RATE_LIMIT_WINDOW_MS</code></td>
+                                <td>Ventana de rate limit</td>
+                                <td><code>900000</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>RATE_LIMIT_MAX_REQUESTS</code></td>
+                                <td>Máximo requests por ventana</td>
+                                <td><code>100</code></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Logging</h3>
+                    <p>El sistema de logging utiliza Winston con dos formatos:</p>
+                    <ul>
+                        <li><strong>Development</strong>: Pretty format con colores</li>
+                        <li><strong>Production</strong>: JSON estructurado</li>
+                    </ul>
+
+                    <p>Los logs se guardan en:</p>
+                    <ul>
+                        <li><code>logs/error.log</code>: Solo errores</li>
+                        <li><code>logs/combined.log</code>: Todos los logs</li>
+                    </ul>
+
+                    <h2 id="security">🔒 Seguridad</h2>
+                    <ul>
+                        <li><strong>Helmet</strong>: Headers de seguridad HTTP</li>
+                        <li><strong>CORS</strong>: Configuración cross-origin</li>
+                        <li><strong>Rate Limiting</strong>: Protección contra abuse</li>
+                        <li><strong>Validación</strong>: Joi schemas para input validation</li>
+                        <li><strong>Request ID</strong>: Tracking de requests para auditoría</li>
+                    </ul>
+
+                    <h2 id="monitoring">📊 Monitoreo</h2>
+                    <ul>
+                        <li><strong>Health Checks</strong>: <code>/health</code> y <code>/health/detailed</code></li>
+                        <li><strong>Request Logging</strong>: Todos los requests son loggeados</li>
+                        <li><strong>Error Tracking</strong>: Errores centralizados con stack traces</li>
+                        <li><strong>Performance</strong>: Tracking de duración de requests</li>
+                    </ul>
+
+                    <h2>🤝 Contribuir</h2>
+                    <ol>
+                        <li>Fork el proyecto</li>
+                        <li>Crear feature branch (<code>git checkout -b feature/nueva-funcionalidad</code>)</li>
+                        <li>Commit cambios (<code>git commit -am 'Agregar nueva funcionalidad'</code>)</li>
+                        <li>Push branch (<code>git push origin feature/nueva-funcionalidad</code>)</li>
+                        <li>Crear Pull Request</li>
+                    </ol>
+
+                    <h2>📄 Licencia</h2>
+                    <p>MIT License - ver archivo <a href="LICENSE">LICENSE</a> para detalles.</p>
+
+                    <hr style="margin: 48px 0; border: none; height: 1px; background: var(--border);">
+                    
+                    <p style="text-align: center; color: var(--text-muted); font-style: italic;">
+                        <strong>Desarrollado con ❤️ usando TypeScript, Express.js y las mejores prácticas de desarrollo.</strong>
+                    </p>
+                </article>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-links">
+                    <a href="/api/feriados" class="footer-link">API Feriados</a>
+                    <a href="/health" class="footer-link">Health Check</a>
+                    <a href="/api/feriados/stats" class="footer-link">Estadísticas</a>
+                </div>
+                <p>&copy; 2025 TypeScript REST API. Desarrollado con las mejores prácticas.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add active state to TOC links based on scroll position
+        const observerOptions = {
+            rootMargin: '-20% 0px -80% 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                const id = entry.target.getAttribute('id');
+                const tocLink = document.querySelector(`.toc a[href="#${id}"]`);
+                
+                if (entry.isIntersecting) {
+                    document.querySelectorAll('.toc a').forEach(link => {
+                        link.style.color = 'var(--text-secondary)';
+                        link.style.fontWeight = '400';
+                    });
+                    if (tocLink) {
+                        tocLink.style.color = 'var(--primary-color)';
+                        tocLink.style.fontWeight = '600';
+                    }
+                }
+            });
+        }, observerOptions);
+
+        // Observe all headings with IDs
+        document.querySelectorAll('h1[id], h2[id], h3[id], h4[id]').forEach(heading => {
+            observer.observe(heading);
+        });
+
+        // Test API connectivity and update status
+        async function checkApiStatus() {
+            try {
+                const response = await fetch('/health');
+                const statusBadge = document.querySelector('.status-badge');
+                
+                if (response.ok) {
+                    statusBadge.style.background = 'var(--success-color)';
+                    statusBadge.innerHTML = '<div class="status-dot"></div>En línea';
+                } else {
+                    statusBadge.style.background = 'var(--warning-color)';
+                    statusBadge.innerHTML = '<div class="status-dot"></div>Degradado';
+                }
+            } catch (error) {
+                const statusBadge = document.querySelector('.status-badge');
+                statusBadge.style.background = 'var(--error-color)';
+                statusBadge.innerHTML = '<div class="status-dot"></div>Fuera de línea';
+            }
+        }
+
+        // Check API status on load and every 30 seconds
+        checkApiStatus();
+        setInterval(checkApiStatus, 30000);
+    </script>
+</body>
+</html>
